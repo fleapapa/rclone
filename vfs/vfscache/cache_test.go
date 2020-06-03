@@ -76,7 +76,7 @@ func newTestCache(t *testing.T) (r *fstest.Run, c *Cache, cleanup func()) {
 	// Disable the cache cleaner as it interferes with these tests
 	opt.CachePollInterval = 0
 
-	// Enable synchronous write
+	// Disable synchronous write
 	opt.WriteBack = 0
 
 	return newTestCacheOpt(t, opt)
@@ -402,7 +402,6 @@ func TestCachePurgeOverQuota(t *testing.T) {
 
 	// make potato definitely after potato2
 	t2 := t1.Add(20 * time.Second)
-	require.NoError(t, potato.Truncate(5))
 	potato.info.ATime = t2
 
 	// Check only potato2 removed to get below quota
@@ -563,13 +562,13 @@ func TestCacheCleaner(t *testing.T) {
 
 	potato := c.Item("potato")
 	potato2, found := c.get("potato")
-	assert.Equal(t, potato, potato2)
+	assert.Equal(t, fmt.Sprintf("%p", potato), fmt.Sprintf("%p", potato2))
 	assert.True(t, found)
 
 	time.Sleep(10 * opt.CachePollInterval)
 
 	potato2, found = c.get("potato")
-	assert.NotEqual(t, potato, potato2)
+	assert.NotEqual(t, fmt.Sprintf("%p", potato), fmt.Sprintf("%p", potato2))
 	assert.False(t, found)
 }
 
