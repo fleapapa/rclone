@@ -19,6 +19,7 @@ import (
 	"github.com/rclone/rclone/fs/config"
 	"github.com/rclone/rclone/fs/hash"
 	"github.com/rclone/rclone/fs/operations"
+	"github.com/rclone/rclone/lib/file"
 	"github.com/rclone/rclone/vfs/vfscommon"
 )
 
@@ -61,9 +62,9 @@ func New(ctx context.Context, fremote fs.Fs, opt *vfscommon.Options) (*Cache, er
 		}
 		fRoot = strings.Replace(fRoot, ":", "", -1)
 	}
-	root := filepath.Join(config.CacheDir, "vfs", fremote.Name(), fRoot)
+	root := file.UNCPath(filepath.Join(config.CacheDir, "vfs", fremote.Name(), fRoot))
 	fs.Debugf(nil, "vfs cache root is %q", root)
-	metaRoot := filepath.Join(config.CacheDir, "vfsMeta", fremote.Name(), fRoot)
+	metaRoot := file.UNCPath(filepath.Join(config.CacheDir, "vfsMeta", fremote.Name(), fRoot))
 	fs.Debugf(nil, "vfs metadata cache root is %q", root)
 
 	fcache, err := fscache.Get(root)
