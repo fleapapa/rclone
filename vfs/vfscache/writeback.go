@@ -290,15 +290,20 @@ func (wb *writeBack) _cancelUpload(wbItem *writeBackItem) {
 		return
 	}
 	fs.Debugf(wbItem.name, "vfs cache: cancelling upload")
+	if wbItem.uploading {
+		wbItem.uploading = false
+		wb.uploads--
+	}
 	if wbItem.cancel != nil {
 		// Cancel the upload - this may or may not be effective
 		wbItem.cancel()
 		// wait for the uploader to finish
+		//
+		// we need to wait without the lock otherwise the
+		// background part will never run.
+		wb.mu.Unlock()
 		<-wbItem.done
-	}
-	if wbItem.uploading {
-		wbItem.uploading = false
-		wb.uploads--
+		wb.mu.Lock()
 	}
 	// uploading items are not on the heap so add them back
 	wb._pushItem(wbItem)
