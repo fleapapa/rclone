@@ -215,8 +215,8 @@ func (c *Cache) put(name string, item *Item) (oldItem *Item) {
 func (c *Cache) InUse(name string) bool {
 	name = clean(name)
 	c.mu.Lock()
-	defer c.mu.Unlock()
 	item := c.item[name]
+	c.mu.Unlock()
 	if item == nil {
 		return false
 	}
